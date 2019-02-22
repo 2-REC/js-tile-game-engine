@@ -1,2 +1,2 @@
-# js-platformer
-Simple platformer game written in JavaScript.
+# js-tile-game-engine
+Simple tile-based game engine written in JavaScript.
