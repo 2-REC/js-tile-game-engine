@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+<!-- TODO: check meta/params - need more? -->
+        <meta name="viewport" content="user-scalable=no, width=device-width">
+<!-- TODO: include css file(s)
+        <link href="....css" rel="stylesheet" type="text/css">
+-->
+<!-- TODO: what name? -->
+        <title>Level ?</title>
+    </head>
+
+    <body>
+<!-- TODO: add pause menu HTML
+-->
+
+        <canvas></canvas>
+
+        <script type="text/javascript">
+            // adding JavaScript files to the page
+            // TODO: file list should be obtained automatically (from "src/<NAME>" dir, where <NAME> is the current file's name)
+            let files = ["../js/level/controller.js", "../js/level/display.js", "../js/level/engine.js", "../js/level/game.js", "../js/level/main.js"];
+            for(let index=0; index<files.length; index++) {
+                let script = document.createElement("script");
+                script.setAttribute("type", "text/javascript");
+                script.setAttribute("src", files[index]);
+                document.head.appendChild(script);
+            }
+/* TODO: add pause menu handling (click listener?)
+*/
+        </script>
+    </body>
+</html>

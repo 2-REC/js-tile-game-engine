@@ -1,0 +1,30 @@
+
+FILE TREE:
+
+[doc]
+    infos.txt
+        => This file.
+
+[code]
+    [res]
+        [images]
+        ([sounds])
+        ?[scripts]?
+    [src]
+        [css]
+        [html]
+            (intro.html)
+            level.html
+            menu.html
+        [js]
+            ?([intro])
+            [level]
+                controller.js
+                display.js
+                engine.js
+                game.js
+                main.js
+            [menu]
+                main.js => TO DO!
+    index.html
+        => Starting point.
