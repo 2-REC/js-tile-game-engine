@@ -7,17 +7,16 @@
 const Controller = function() {
 
     //// BEGIN
-    this.down  = new Controller.ButtonInput();
     this.left  = new Controller.ButtonInput();
     this.right = new Controller.ButtonInput();
     this.up    = new Controller.ButtonInput();
     //// END
 
 
-    this.keyDownUp = function(event) {
+    this.keyDownUp = function(type, key_code) {
         //// BEGIN
-        var down = (event.type == "keydown") ? true : false;
-        switch (event.keyCode) {
+        var down = (type == "keydown") ? true : false;
+        switch (key_code) {
             case 37:
                 this.left.getInput(down);
                 break;
@@ -27,16 +26,9 @@ const Controller = function() {
             case 39:
                 this.right.getInput(down);
                 break;
-            case 40:
-                this.down.getInput(down);
-                break;
         }
-        alert("Key " + event.keyCode + " pressed");
         //// END
     };
-
-
-    this.handleKeyDownUp = (event) => { this.keyDownUp(event); };
 
 };
 

@@ -20,7 +20,7 @@ const Engine = function(time_step, update_fct, render_fct) {
     this.start = function() {
         this.time_delta = this.time_step;
         this.time = window.performance.now();
-        this.animation_frame_request = window.requestAnimationFrame(this.handleRun);
+        this.animation_frame_request = window.requestAnimationFrame(this.handleLoop);
     };
 
 // TODO: OK to define here instead?
@@ -28,7 +28,7 @@ const Engine = function(time_step, update_fct, render_fct) {
         window.cancelAnimationFrame(this.animation_frame_request);
     }
 
-    this.run = function(time) {
+    this.loop = function(time) {
         this.time_delta += (time - this.time);
         this.time = time;
 
@@ -50,11 +50,11 @@ const Engine = function(time_step, update_fct, render_fct) {
             this.render(time);
         }
 
-        this.animation_frame_request = window.requestAnimationFrame(this.handleRun);
+        this.animation_frame_request = window.requestAnimationFrame(this.handleLoop);
     };
 
 
-    this.handleRun = (time_step) => { this.run(time_step); };
+    this.handleLoop = (time_step) => { this.loop(time_step); };
 
 };
 
@@ -66,7 +66,7 @@ Engine.prototype = {
     start : function() {
         this.time_delta = this.time_step;
         this.time = window.performance.now();
-        this.animation_frame_request = window.requestAnimationFrame(this.handleRun);
+        this.animation_frame_request = window.requestAnimationFrame(this.handleLoop);
     },
 
     stop : function() {
