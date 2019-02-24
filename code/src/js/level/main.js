@@ -19,11 +19,11 @@ window.addEventListener("load", function(event) {
     };
 
     var render = function() {
+        display.drawMap(game.world.map, game.world.columns);
+
         //// BEGIN
-        display.drawLevel(game.world.background_color);
-        display.drawPlayer(game.world.player.x, game.world.player.y,
-                game.world.player.width, game.world.player.height,
-                game.world.player.color);
+// TODO: should have an array of objects to display
+        display.drawPlayer(game.world.player, game.world.player.color);
         //// END
 
         display.render();
@@ -52,12 +52,23 @@ window.addEventListener("load", function(event) {
     var engine = new Engine(1000/30, render, update);
 
 
+    display.buffer.canvas.height = game.world.height;
+    display.buffer.canvas.width = game.world.width;
+
+// TODO: change to wait until everything is loaded, not just the tilesheet
+    display.tile_sheet.image.addEventListener("load", function(event) {
+        resize();
+        engine.start();
+    }, { once:true });
+
+// TODO: get filename from level config & path from game config?
+var image_path = "../../res/images/level/";
+    display.tile_sheet.image.src = image_path + "tilesheet.png";
+
+
     window.addEventListener("resize", resize);
 // TODO: separate key up/down?
     window.addEventListener("keydown", keyDownUp);
     window.addEventListener("keyup", keyDownUp);
-
-    resize();
-    engine.start();
 
 });

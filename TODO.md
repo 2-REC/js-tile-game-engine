@@ -1,7 +1,5 @@
 # TODO
 
-- [ ] FIX SIZE AREA OF GAME PROBLEM!
-
 - [ ] Get parameters from configuration (file?)
     - velocity, friction, jump force, etc.
 - [ ] Use PIXI.js for graphics/sprites
@@ -17,3 +15,7 @@
         - [ ] don't add gravity when TOP
         - [ ] set Player's parameters when instantiating (not using all defaults...)
 - [ ] Set buttons configurable (keyboard + gamepad?)
+
+- [ ] Create resources
+    - [ ] Tilesheets (& delete current "tilesheet.png"
+    - [ ] Maps (use Tiled?)
