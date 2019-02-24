@@ -14,7 +14,7 @@ const Display = function(canvas) {
     this.drawMap = function(map, columns) {
 // TODO: why from last to first?
         for (let index = map.length - 1; index >= 0; -- index) {
-            let value = map[index] - 1;
+            let value = map[index];
 
             let source_x = (value % this.tile_sheet.columns) * this.tile_sheet.tile_size;
             let source_y = Math.floor(value / this.tile_sheet.columns) * this.tile_sheet.tile_size;
@@ -32,7 +32,7 @@ const Display = function(canvas) {
 // TODO: should have array of objects to draw
     this.drawPlayer = function(rectangle, color) {
         this.buffer.fillStyle = color;
-        this.buffer.fillRect(Math.floor(rectangle.x), Math.floor(rectangle.y), rectangle.width, rectangle.height);
+        this.buffer.fillRect(Math.round(rectangle.x), Math.round(rectangle.y), rectangle.width, rectangle.height);
     };
     //// END
 

@@ -1,5 +1,8 @@
 # TODO
 
+- [ ] Remove possibility to jump when falling!
+- [ ] See if can easily handle worlds bigger than screen (scrolling)
+    (then add parallax scrolling, etc.)
 - [ ] Get parameters from configuration (file?)
     - velocity, friction, jump force, etc.
 - [ ] Use PIXI.js for graphics/sprites
