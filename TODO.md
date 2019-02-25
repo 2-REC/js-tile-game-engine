@@ -1,5 +1,9 @@
 # TODO
 
+- [ ] Fix tunnelling problem the right way (IT IS A COLLISION PROBLEM)
+- [ ] Handle separate sheets for sprites and map (1 per object)
+- [ ] Add more animation states
+- [ ] Add loop handling for animations (stop at end or loop)
 - [ ] Remove possibility to jump when falling!
 - [ ] See if can easily handle worlds bigger than screen (scrolling)
     (then add parallax scrolling, etc.)
