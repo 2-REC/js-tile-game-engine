@@ -16,133 +16,63 @@ Game.prototype.constructor = Game;
 
 
 /**
- * GAME.WORLD CLASS
+ * GAME.ANIMATOR CLASS
  */
- 
-Game.World = function() {
 
-    //// BEGIN
-// TODO: get from config (where? how?)
-    this.friction = 0.8;
-    this.gravity = 2;
-
-// TODO: get data from file (json?)
-    this.columns = 12;
-    this.rows = 9;
-
-    this.tile_set = new Game.World.TileSet(8, 16);
-
-    this.map = [48,17,17,17,49,48,18,19,16,17,35,36,
-                10,39,39,39,16,18,39,31,31,31,39,07,
-                10,31,39,31,31,31,39,12,05,05,28,01,
-                35,06,39,39,31,39,39,19,39,39,08,09,
-                02,31,31,47,39,47,39,31,31,04,36,25,
-                10,39,39,31,39,39,39,31,31,31,39,37,
-                10,39,31,04,14,06,39,39,03,39,00,42,
-                49,02,31,31,11,39,39,31,11,00,42,09,
-                08,40,27,13,37,27,13,03,22,34,09,24];
-
-// TODO: use system as in Replica Island (more complex shapes allowed)
-    /* These collision values correspond to collision functions in the Collider class.
-     Except 00 that corresponds to nothing.
-        0000 = 0  tile 0:    0    tile 1:   1     tile 2:    0    tile 15:    1
-        0001 = 1           0   0          0   0            0   1            1   1
-        0010 = 2             0              0                0                1
-        1111 = 15        No walls     Wall on top      Wall on Right      four walls
-      Each bit represents a side: 0 0 0 0 = l b r t (left bottom right top).
-    */
-    this.collision_map = [00,04,04,04,00,00,04,04,04,04,04,00,
-                          02,00,00,00,12,06,00,00,00,00,00,08,
-                          02,00,00,00,00,00,00,09,05,05,01,00,
-                          00,07,00,00,00,00,00,14,00,00,08,00,
-                          02,00,00,01,00,01,00,00,00,13,04,00,
-                          02,00,00,00,00,00,00,00,00,00,00,08,
-                          02,00,00,13,01,07,00,00,11,00,09,00,
-                          00,03,00,00,10,00,00,00,08,01,00,00,
-                          00,00,01,01,00,01,01,01,00,00,00,00];
-    //// END
-
-    this.height = this.tile_set.tile_size * this.rows;
-    this.width = this.tile_set.tile_size * this.columns;
-
-    this.collider = new Game.World.Collider();
-
-    //// BEGIN
-// TODO: handle other objects ... (create from map data - other layers)
-    this.player = new Game.World.Object.Player(100, 100);
-    //// END
-
+Game.Animator = function(frame_set, delay) {
+    this.count = 0;
+    this.delay = (delay >= 1) ? delay : 1;
+    this.frame_set = frame_set;
+    this.frame_index = 0;
+    this.frame_value = frame_set[0];
+    this.mode = "pause";
 };
 
-Game.World.prototype = {
+Game.Animator.prototype = {
 
-    constructor: Game.World,
+    constructor: Game.Animator,
 
-// TODO: adapt... (use collision tilemap)
-    collideObject: function(object) {
-
-        /* stay inside the world */
-        if (object.getLeft() < 0) {
-            object.setLeft(0);
-            object.velocity_x = 0;
+    animate: function() {
+        switch(this.mode) {
+            case "loop" :
+                this.loop();
+                break;
+            case "pause":
+                break;
         }
-        else if (object.getRight() > this.width) {
-            object.setRight(this.width);
-            object.velocity_x = 0;
-        }
-
-        if (object.getTop() < 0) {
-            object.setTop(0);
-            object.velocity_y = 0;
-        }
-        else if (object.getBottom() > this.height) {
-            object.setBottom(this.height);
-            object.velocity_y = 0;
-            object.jumping = false;
-        }
-
-        /* check collision with each corner of the object */
-        var bottom, left, right, top, value;
-        var tile_size = this.tile_set.tile_size;
-
-        top = Math.floor(object.getTop() / tile_size);
-        left = Math.floor(object.getLeft() / tile_size);
-        value = this.collision_map[(top * this.columns) + left];
-        this.collider.collide(value, object, left * tile_size, top * tile_size, tile_size);
-
-        top = Math.floor(object.getTop() / tile_size);
-        right = Math.floor(object.getRight() / tile_size);
-        value = this.collision_map[(top * this.columns) + right];
-        this.collider.collide(value, object, right * tile_size, top * tile_size, tile_size);
-
-        bottom = Math.floor(object.getBottom() / tile_size);
-        left = Math.floor(object.getLeft() / tile_size);
-        value = this.collision_map[(bottom * this.columns) + left];
-        this.collider.collide(value, object, left * tile_size, bottom * tile_size, tile_size);
-
-        bottom = Math.floor(object.getBottom() / tile_size);
-        right = Math.floor(object.getRight() / tile_size);
-        value = this.collision_map[(bottom * this.columns) + right];
-        this.collider.collide(value, object, right * tile_size, bottom * tile_size, tile_size);
-
     },
 
-    update: function() {
-        this.player.updatePosition(this.gravity, this.friction);
+// TODO: why not defined as "function"?
+    changeFrameSet(frame_set, mode, delay = 10, frame_index = 0) {
+        if (this.frame_set === frame_set) {
+            return;
+        }
 
-        this.collideObject(this.player);
+        this.count = 0;
+        this.delay = delay;
+        this.frame_set = frame_set;
+        this.frame_index = frame_index;
+        this.frame_value = frame_set[frame_index];
+        this.mode = mode;
+    },
 
-        this.player.updateAnimation();
+    loop: function() {
+        this.count++;
+        while(this.count > this.delay) {
+            this.count -= this.delay;
+            this.frame_index = (this.frame_index < this.frame_set.length - 1) ? this.frame_index + 1 : 0;
+            this.frame_value = this.frame_set[this.frame_index];
+        }
     }
 
 };
 
 
 /**
- * GAME.WORLD.COLLIDER CLASS
+ * GAME.COLLIDER CLASS
  */
 
-Game.World.Collider = function() {
+Game.Collider = function() {
 
     this.collide = function(value, object, tile_x, tile_y, tile_size) {
 
@@ -173,19 +103,19 @@ methods are mixed and matched for each unique tile. */
                 this.collidePlatformBottom(object, tile_y + tile_size);
                 break;
             case  6:
-                if (this.collidePlatformRight(object, tile_x + tile_size)) {
+                if (this.collidePlatformBottom(object, tile_y + tile_size)) {
                     return;
                 }
-                this.collidePlatformBottom(object, tile_y + tile_size);
+                this.collidePlatformRight(object, tile_x + tile_size);
                 break;
             case  7:
                 if (this.collidePlatformTop(object, tile_y)) {
                     return;
                 }
-                if (this.collidePlatformRight(object, tile_x + tile_size)) {
+                if (this.collidePlatformBottom(object, tile_y + tile_size)) {
                     return;
                 }
-                this.collidePlatformBottom(object, tile_y + tile_size);
+                this.collidePlatformRight(object, tile_x + tile_size);
                 break;
             case  8:
                 this.collidePlatformLeft(object, tile_x);
@@ -212,49 +142,49 @@ methods are mixed and matched for each unique tile. */
                 this.collidePlatformRight(object, tile_x + tile_size);
                 break;
             case 12:
-                if (this.collidePlatformLeft(object, tile_x)) {
+                if (this.collidePlatformBottom(object, tile_y + tile_size)) {
                     return;
                 }
-                this.collidePlatformBottom(object, tile_y + tile_size);
+                this.collidePlatformLeft(object, tile_x);
                 break;
             case 13:
                 if (this.collidePlatformTop(object, tile_y)) {
                     return;
                 }
-                if (this.collidePlatformLeft(object, tile_x)) {
+                if (this.collidePlatformBottom(object, tile_y + tile_size)) {
                     return;
                 }
-                this.collidePlatformBottom(object, tile_y + tile_size);
+                this.collidePlatformLeft(object, tile_x);
                 break;
             case 14:
+                if (this.collidePlatformBottom(object, tile_y + tile_size)) {
+                    return;
+                }
                 if (this.collidePlatformLeft(object, tile_x)) {
                     return;
                 }
-                if (this.collidePlatformRight(object, tile_x)) {
-                    return;
-                }
-                this.collidePlatformBottom(object, tile_y + tile_size);
+                this.collidePlatformRight(object, tile_x);
                 break;
             case 15:
                 if (this.collidePlatformTop(object, tile_y)) {
                     return;
                 }
+                if (this.collidePlatformBottom(object, tile_y + tile_size)) {
+                    return;
+                }
                 if (this.collidePlatformLeft(object, tile_x)) {
                     return;
                 }
-                if (this.collidePlatformRight(object, tile_x + tile_size)) {
-                    return;
-                }
-                this.collidePlatformBottom(object, tile_y + tile_size);
+                this.collidePlatformRight(object, tile_x + tile_size);
                 break;
         }
     }
 
 };
 
-Game.World.Collider.prototype = {
+Game.Collider.prototype = {
 
-    constructor: Game.World.Collider,
+    constructor: Game.Collider,
 
     collidePlatformBottom:function(object, tile_bottom) {
         if ((object.getTop() < tile_bottom) && (object.getOldTop() >= tile_bottom)) {
@@ -299,22 +229,44 @@ Game.World.Collider.prototype = {
 
 
 /**
- * GAME.WORLD.OBJECT CLASS
+ * GAME.FRAME CLASS
  */
 
-Game.World.Object = function(x, y, width, height) {
+Game.Frame = function(x, y, width, height, offset_x, offset_y) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.offset_x = offset_x;
+    this.offset_y = offset_y;
+};
+
+Game.Frame.prototype.constructor = Game.Frame;
+
+
+/**
+ * GAME.OBJECT CLASS
+ */
+
+Game.Object = function(x, y, width, height) {
     this.height = height;
     this.width = width;
     this.x = x;
-    this.x_old = x;
     this.y = y;
-    this.y_old = y;
 
 };
 
-Game.World.Object.prototype = {
+Game.Object.prototype = {
 
-    constructor: Game.World.Object,
+    constructor: Game.Object,
+
+    getCenterX: function() {
+        return (this.x + (this.width  * 0.5));
+    },
+
+    getCenterY: function() {
+        return (this.y + (this.height * 0.5));
+    },
 
     getBottom: function() {
         return (this.y + this.height);
@@ -332,20 +284,12 @@ Game.World.Object.prototype = {
         return this.y;
     },
 
-    getOldBottom: function() {
-        return (this.y_old + this.height);
+    setCenterX: function(x) {
+        this.x = x - (this.width  * 0.5);
     },
 
-    getOldLeft: function() {
-        return this.x_old;
-    },
-
-    getOldRight: function() {
-        return (this.x_old + this.width);
-    },
-
-    getOldTop: function() {
-        return this.y_old;
+    setCenterY: function(y) {
+        this.y = y - (this.height * 0.5);
     },
 
     setBottom: function(y) {
@@ -362,10 +306,64 @@ Game.World.Object.prototype = {
 
     setTop: function(y) {
         this.y = y;
+    }
+
+};
+
+
+/**
+ * GAME.MOVINGOBJECT CLASS
+ */
+
+Game.MovingObject = function(x, y, width, height, velocity_max = 15) {
+
+    Game.Object.call(this, x, y, width, height);
+
+    this.jumping = false;
+    this.velocity_max = velocity_max;
+    this.velocity_x = 0;
+    this.velocity_y = 0;
+    this.x_old = x;
+    this.y_old = y;
+
+};
+
+Game.MovingObject.prototype = {
+
+    getOldBottom: function() {
+        return (this.y_old + this.height);
+    },
+
+    getOldCenterX: function() {
+        return (this.x_old + (this.width  * 0.5));
+    },
+
+    getOldCenterY: function() {
+        return (this.y_old + (this.height * 0.5));
+    },
+
+    getOldLeft: function() {
+        return this.x_old;
+    },
+
+    getOldRight: function() {
+        return (this.x_old + this.width);
+    },
+
+    getOldTop: function() {
+        return this.y_old;
     },
 
     setOldBottom: function(y) {
         this.y_old = y - this.height;
+    },
+
+    setOldCenterX: function(x) {
+        this.x_old = x - (this.width  * 0.5);
+    },
+
+    setOldCenterY: function(y) {
+        this.y_old = y - (this.height * 0.5);
     },
 
     setOldLeft: function(x) {
@@ -382,67 +380,52 @@ Game.World.Object.prototype = {
 
 };
 
+Object.assign(Game.MovingObject.prototype, Game.Object.prototype);
+Game.MovingObject.prototype.constructor = Game.MovingObject;
+
 
 /**
- * GAME.WORLD.OBJECT.ANIMATOR CLASS
+ * GAME.DOOR CLASS
  */
 
-Game.World.Object.Animator = function(frame_set, delay) {
-    this.count = 0;
-    this.delay = (delay >= 1) ? delay : 1;
-    this.frame_set = frame_set;
-    this.frame_index = 0;
-    this.frame_value = frame_set[0];
-    this.mode = "pause";
+Game.Door = function(door) {
+
+    Game.Object.call(this, door.x, door.y, door.width, door.height);
+
+    this.destination_x = door.destination_x;
+    this.destination_y = door.destination_y;
+    this.destination_zone = door.destination_zone;
+
 };
 
-Game.World.Object.Animator.prototype = {
+Game.Door.prototype = {
 
-    constructor: Game.World.Object.Animator,
+    collideObject(object) {
+        let center_x = object.getCenterX();
+        let center_y = object.getCenterY();
 
-    animate: function() {
-        switch(this.mode) {
-            case "loop" :
-                this.loop();
-                break;
-            case "pause":
-                break;
-        }
-    },
-
-    changeFrameSet(frame_set, mode, delay = 10, frame_index = 0) {
-        if (this.frame_set === frame_set) {
-            return;
+        if ((center_x < this.getLeft()) || (center_x > this.getRight())
+                || (center_y < this.getTop())  || (center_y > this.getBottom())) {
+            return false;
         }
 
-        this.count = 0;
-        this.delay = delay;
-        this.frame_set = frame_set;
-        this.frame_index = frame_index;
-        this.frame_value = frame_set[frame_index];
-        this.mode = mode;
-    },
-
-    loop:function() {
-        this.count++;
-        while(this.count > this.delay) {
-            this.count -= this.delay;
-            this.frame_index = (this.frame_index < this.frame_set.length - 1) ? this.frame_index + 1 : 0;
-            this.frame_value = this.frame_set[this.frame_index];
-        }
+        return true;
     }
 
 };
 
+Object.assign(Game.Door.prototype, Game.Object.prototype);
+Game.Door.prototype.constructor = Game.Door;
+
 
 /**
- * GAME.WORLD.PLAYER CLASS
+ * GAME.PLAYER CLASS
  */
 
-Game.World.Object.Player = function(x, y) {
+Game.Player = function(x, y) {
 
-    Game.World.Object.call(this, 100, 100, 7, 14);
-    Game.World.Object.Animator.call(this, Game.World.Object.Player.prototype.frame_sets["idle-left"], 10);
+    Game.MovingObject.call(this, x, y, 7, 12);
+    Game.Animator.call(this, Game.Player.prototype.frame_sets["idle-left"], 10);
 
     this.jumping = true;
     this.direction_x = -1;
@@ -450,11 +433,9 @@ Game.World.Object.Player = function(x, y) {
     this.velocity_y = 0;
 };
 
-Game.World.Object.Player.prototype = {
+Game.Player.prototype = {
 
-    constructor: Game.World.Object.Player,
-
-// TODO: get thisfrom files and generate dynamically
+// TODO: get this from files and generate dynamically
     frame_sets: {
         "idle-left": [0],
         "jump-left": [1],
@@ -465,10 +446,12 @@ Game.World.Object.Player.prototype = {
     },
 
     jump: function() {
-        if (!this.jumping) {
+// TODO: keep hardcoded 10?
+        if (!this.jumping && (this.velocity_y < 10)) {
             this.jumping = true;
 // TODO: "-=" or just "-"?
-            this.velocity_y -= 20;
+// TODO: should adapt, and fix tunneling issue...
+            this.velocity_y -= 13;
         }
     },
 
@@ -513,31 +496,39 @@ Game.World.Object.Player.prototype = {
     updatePosition: function(gravity, friction) {
         this.x_old = this.x;
         this.y_old = this.y;
-        this.velocity_y += gravity;
-        this.x += this.velocity_x;
-        this.y += this.velocity_y;
 
         this.velocity_x *= friction;
-        this.velocity_y *= friction;
+        this.velocity_y += gravity;
+
+        if (Math.abs(this.velocity_x) > this.velocity_max) {
+            this.velocity_x = this.velocity_max * Math.sign(this.velocity_x);
+        }
+
+        if (Math.abs(this.velocity_y) > this.velocity_max) {
+            this.velocity_y = this.velocity_max * Math.sign(this.velocity_y);
+        }
+
+        this.x += this.velocity_x;
+        this.y += this.velocity_y;
     }
 
 };
 
-Object.assign(Game.World.Object.Player.prototype, Game.World.Object.prototype);
-Object.assign(Game.World.Object.Player.prototype, Game.World.Object.Animator.prototype);
-Game.World.Object.Player.prototype.constructor = Game.World.Object.Player;
+Object.assign(Game.Player.prototype, Game.MovingObject.prototype);
+Object.assign(Game.Player.prototype, Game.Animator.prototype);
+Game.Player.prototype.constructor = Game.Player;
 
 
 /**
- * GAME.WORLD.TILESET CLASS
+ * GAME.TILESET CLASS
  */
 
-Game.World.TileSet = function(columns, tile_size) {
+Game.TileSet = function(columns, tile_size) {
 
     this.columns = columns;
     this.tile_size = tile_size;
 
-    let frame = Game.World.TileSet.Frame;
+    let frame = Game.Frame;
 
 // TODO: change this and get it from data files
     this.frames = [new frame(115,  96, 13, 16, 0, -2), // idle-left
@@ -550,24 +541,122 @@ Game.World.TileSet = function(columns, tile_size) {
 
 };
 
-Game.World.TileSet.prototype = {
-    constructor: Game.World.TileSet
+Game.TileSet.prototype = {
+    constructor: Game.TileSet
 };
 
 
 /**
- * GAME.WORLD.TILESET.FRAME CLASS
+ * GAME.WORLD CLASS
  */
+ 
+Game.World = function() {
 
-Game.World.TileSet.Frame = function(x, y, width, height, offset_x, offset_y) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.offset_x = offset_x;
-    this.offset_y = offset_y;
+    this.collider = new Game.Collider();
+
+    //// BEGIN
+// TODO: get from config (where? how?) (with some other additional parameters)
+    this.friction = 0.85;
+    this.gravity = 2;
+
+// TODO: get size data from file (json?)
+    this.columns = 12;
+    this.rows = 9;
+
+    this.tile_set = new Game.TileSet(8, 16);
+
+// TODO: handle other objects ... (create from map data - other layers)
+    this.player = new Game.Player(32, 76);
+
+    this.zone_id   = "00";
+    //// END
+
+    this.doors = [];
+    this.door = undefined;
+
+    this.height = this.tile_set.tile_size * this.rows;
+    this.width = this.tile_set.tile_size * this.columns;
+
 };
 
-Game.World.TileSet.Frame.prototype = {
-    constructor: Game.World.TileSet.Frame
+Game.World.prototype = {
+
+    constructor: Game.World,
+
+// TODO: adapt... (use collision tilemap)
+    collideObject: function(object) {
+
+        /* check collision with each corner of the object */
+        var bottom, left, right, top, value;
+        var tile_size = this.tile_set.tile_size;
+
+        top = Math.floor(object.getTop() / tile_size);
+        left = Math.floor(object.getLeft() / tile_size);
+        value = this.collision_map[(top * this.columns) + left];
+        this.collider.collide(value, object, left * tile_size, top * tile_size, tile_size);
+
+        top = Math.floor(object.getTop() / tile_size);
+        right = Math.floor(object.getRight() / tile_size);
+        value = this.collision_map[(top * this.columns) + right];
+        this.collider.collide(value, object, right * tile_size, top * tile_size, tile_size);
+
+        bottom = Math.floor(object.getBottom() / tile_size);
+        left = Math.floor(object.getLeft() / tile_size);
+        value = this.collision_map[(bottom * this.columns) + left];
+        this.collider.collide(value, object, left * tile_size, bottom * tile_size, tile_size);
+
+        bottom = Math.floor(object.getBottom() / tile_size);
+        right = Math.floor(object.getRight() / tile_size);
+        value = this.collision_map[(bottom * this.columns) + right];
+        this.collider.collide(value, object, right * tile_size, bottom * tile_size, tile_size);
+
+    },
+
+    setup: function(zone) {
+
+        this.graphical_map = zone.graphical_map;
+        this.collision_map = zone.collision_map;
+        this.columns = zone.columns;
+        this.rows = zone.rows;
+        this.doors = new Array();
+        this.zone_id = zone.id;
+
+        for (let index = zone.doors.length - 1; index > -1; --index) {
+            let door = zone.doors[index];
+            this.doors[index] = new Game.Door(door);
+        }
+
+        if (this.door) {
+            if (this.door.destination_x != -1) {
+                this.player.setCenterX(this.door.destination_x);
+                this.player.setOldCenterX(this.door.destination_x);
+            }
+            if (this.door.destination_y != -1) {
+                this.player.setCenterY(this.door.destination_y);
+                this.player.setOldCenterY(this.door.destination_y);
+            }
+            this.door = undefined;
+        }
+    },
+
+    update: function() {
+        this.player.updatePosition(this.gravity, this.friction);
+
+        this.collideObject(this.player);
+
+        for (let index = this.doors.length - 1; index > -1; --index) {
+            let door = this.doors[index];
+            if (door.collideObject(this.player)) {
+                this.door = door;
+            }
+        }
+        this.player.updateAnimation();
+    }
+
 };
+
+
+
+
+
+

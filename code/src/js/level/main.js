@@ -6,6 +6,10 @@ window.addEventListener("load", function(event) {
 
     "use strict";
 
+// TODO: get from somewhere...
+    const ZONE_PREFIX = "../../res/json/levels/zone";
+    const ZONE_SUFFIX = ".json";
+
 
     /*
      * CLASSES
@@ -22,14 +26,24 @@ window.addEventListener("load", function(event) {
 
         constructor: Game.AssetsManager,
 
-        loadTileSetImage: function(url, callback) {
-            this.tile_set_image = new Image();
-            this.tile_set_image.addEventListener("load", function(event) {
-                callback();
-            }, { once : true});
+        requestJSON: function(url, callback) {
+            let request = new XMLHttpRequest();
+            request.addEventListener("load", function(event) {
+                callback(JSON.parse(this.responseText));
+            }, { once:true });
 
-            this.tile_set_image.src = url;
+            request.open("GET", url);
+            request.send();
+        },
+
+        requestImage: function(url, callback) {
+            let image = new Image();
+            image.addEventListener("load", function(event) {
+                callback(image);
+            }, { once:true });
+            image.src = url;
         }
+
     };
 
 
@@ -50,7 +64,7 @@ window.addEventListener("load", function(event) {
 
     var render = function() {
         display.drawMap(assets_manager.tile_set_image,
-                game.world.tile_set.columns, game.world.map,
+                game.world.tile_set.columns, game.world.graphical_map,
                 game.world.columns, game.world.tile_set.tile_size);
 
         let frame = game.world.tile_set.frames[game.world.player.frame_value];
@@ -77,6 +91,16 @@ window.addEventListener("load", function(event) {
         }
 
         game.update();
+
+        if (game.world.door) {
+            engine.stop();
+            assets_manager.requestJSON(ZONE_PREFIX + game.world.door.destination_zone + ZONE_SUFFIX, (zone) => {
+                game.world.setup(zone);
+                engine.start();
+          });
+          return;
+        }
+
     };
 
 
@@ -98,13 +122,17 @@ window.addEventListener("load", function(event) {
     display.buffer.imageSmoothingEnabled = false;
 
 
+    assets_manager.requestJSON(ZONE_PREFIX + game.world.zone_id + ZONE_SUFFIX, (zone) => {
+        game.world.setup(zone);
 // TODO: get filename from level config & path from game config?
-var image_path = "../../res/images/level/tilesheet.png";
-// TODO: change to wait until everything is loaded, not just the tilesheet
-    assets_manager.loadTileSetImage(image_path, () => {
-        resize();
-        engine.start();
+var image_path = "../../res/images/levels/tilesheet.png";
+        assets_manager.requestImage(image_path, (image) => {
+            assets_manager.tile_set_image = image;
+            resize();
+            engine.start();
+        });
     });
+
 
     window.addEventListener("resize", resize);
 // TODO: separate key up/down?

@@ -1,6 +1,7 @@
 # TODO
 
 - [ ] Fix tunnelling problem the right way (IT IS A COLLISION PROBLEM)
+    => PROBLEM ALSO OCCURS AFTER "FIX", WHEN JUMPING FROM RIGHT TO LEFT THROUGH A "U" SHAPED TILE!
 - [ ] Handle separate sheets for sprites and map (1 per object)
 - [ ] Add more animation states
 - [ ] Add loop handling for animations (stop at end or loop)

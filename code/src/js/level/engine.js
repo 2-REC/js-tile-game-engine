@@ -16,19 +16,10 @@ const Engine = function(time_step, update_fct, render_fct) {
     this.animation_frame_request = undefined;
 
 
-// TODO: OK to define here instead?
-    this.start = function() {
-        this.time_delta = this.time_step;
-        this.time = window.performance.now();
-        this.animation_frame_request = window.requestAnimationFrame(this.handleLoop);
-    };
-
-// TODO: OK to define here instead?
-    this.stop = function() {
-        window.cancelAnimationFrame(this.animation_frame_request);
-    }
-
     this.loop = function(time) {
+
+        this.animation_frame_request = window.requestAnimationFrame(this.handleLoop);
+
         this.time_delta += (time - this.time);
         this.time = time;
 
@@ -50,7 +41,6 @@ const Engine = function(time_step, update_fct, render_fct) {
             this.render(time);
         }
 
-        this.animation_frame_request = window.requestAnimationFrame(this.handleLoop);
     };
 
 
@@ -58,21 +48,17 @@ const Engine = function(time_step, update_fct, render_fct) {
 
 };
 
-/*
 Engine.prototype = {
-    constructor : Engine,
 
-// TODO: OK to define in class instead?
-    start : function() {
+    constructor: Engine,
+
+    start: function() {
         this.time_delta = this.time_step;
         this.time = window.performance.now();
         this.animation_frame_request = window.requestAnimationFrame(this.handleLoop);
     },
 
-    stop : function() {
+    stop: function() {
         window.cancelAnimationFrame(this.animation_frame_request);
     }
 };
-*/
-// TODO: necessary?
-Engine.prototype.constructor = Engine;
