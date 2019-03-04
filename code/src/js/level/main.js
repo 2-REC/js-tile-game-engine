@@ -60,20 +60,54 @@ window.addEventListener("load", function(event) {
                 document.documentElement.clientHeight - 32,
                 game.world.height / game.world.width);
         display.render();
+
+// TODO: CHANGE!
+        var rectangle = display.context.canvas.getBoundingClientRect();
+        p.style.left = rectangle.left + "px";
+        p.style.top  = rectangle.top + "px";
+        p.style.fontSize = ((game.world.tile_set.tile_size * rectangle.height) / game.world.height) + "px";
+
     };
 
     var render = function() {
+
+        var frame = undefined;
+
         display.drawMap(assets_manager.tile_set_image,
                 game.world.tile_set.columns, game.world.graphical_map,
                 game.world.columns, game.world.tile_set.tile_size);
 
-        let frame = game.world.tile_set.frames[game.world.player.frame_value];
+// TODO: CHANGE (MAKE GENERIC!)
+        for (let index = game.world.carrots.length - 1; index > -1; -- index) {
+            let carrot = game.world.carrots[index];
+            frame = game.world.tile_set.frames[carrot.frame_value];
+
+            display.drawObject(assets_manager.tile_set_image,
+                    frame.x, frame.y,
+                    carrot.x + Math.floor(carrot.width * 0.5 - frame.width * 0.5) + frame.offset_x,
+                    carrot.y + frame.offset_y, frame.width, frame.height);
+        }
+
+        frame = game.world.tile_set.frames[game.world.player.frame_value];
 
         display.drawObject(assets_manager.tile_set_image,
                 frame.x, frame.y,
                 game.world.player.x + Math.floor(game.world.player.width * 0.5 - frame.width * 0.5) + frame.offset_x,
                 game.world.player.y + frame.offset_y,
                 frame.width, frame.height);
+
+        for (let index = game.world.grass.length - 1; index > -1; -- index) {
+            let grass = game.world.grass[index];
+            frame = game.world.tile_set.frames[grass.frame_value];
+
+            display.drawObject(assets_manager.tile_set_image,
+                    frame.x, frame.y,
+                    grass.x + frame.offset_x,
+                    grass.y + frame.offset_y, frame.width, frame.height);
+        }
+
+// TODO: CHANGE!
+        p.innerHTML = "Carrots: " + game.world.carrot_count;
 
         display.render();
     };
@@ -115,6 +149,11 @@ window.addEventListener("load", function(event) {
 // TODO: set time step as configurable param?
     var engine = new Engine(1000/30, render, update);
 
+// TODO: CHANGE!
+    var p = document.createElement("p");
+    p.setAttribute("style", "color:#c07000; font-size:2.0em; position:fixed;");
+    p.innerHTML = "Carrots: 0";
+    document.body.appendChild(p);
 
 // TODO: move to Display class init function...
     display.buffer.canvas.height = game.world.height;
