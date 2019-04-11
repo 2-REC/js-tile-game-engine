@@ -1,6 +1,11 @@
 # TODO
 
 - [ ] Remove carrots stuff, and adapt levels/zones ...
+- [ ] Change objects handling
+    => As in Replica (object layer with IDs)
+- [ ] Handle several visual layers for levels (as in Replica, with z-index)
+    => And change grass to "graphical objects"
+?- [ ] Make separate files for objects? (clasify?)
 
 - [ ] Fix tunnelling problem the right way (IT IS A COLLISION PROBLEM)
     => PROBLEM ALSO OCCURS AFTER "FIX", WHEN JUMPING FROM RIGHT TO LEFT THROUGH A "U" SHAPED TILE!
