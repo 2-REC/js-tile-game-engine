@@ -336,7 +336,9 @@ Game.Object.prototype = {
  * GAME.MOVINGOBJECT CLASS
  */
 
-Game.MovingObject = function(x, y, width, height, velocity_max = 15) {
+// SIZE_FACTOR
+//Game.MovingObject = function(x, y, width, height, velocity_max = 15) {
+Game.MovingObject = function(x, y, width, height, velocity_max = 60) {
 
     Game.Object.call(this, x, y, width, height);
 
@@ -406,13 +408,16 @@ Game.MovingObject.prototype.constructor = Game.MovingObject;
 
 
 // TODO: CHANGE!
+// => First to "chilli", then more generic...
 /**
  * GAME.CARROT CLASS
  */
 
 Game.Carrot = function(x, y) {
 
-    Game.Object.call(this, x, y, 7, 14);
+// SIZE_FACTOR
+//    Game.Object.call(this, x, y, 7, 14);
+    Game.Object.call(this, x, y, 28, 56);
     Game.Animator.call(this, Game.Carrot.prototype.frame_sets["twirl"], 15);
 
     this.frame_index = Math.floor(Math.random() * 2);
@@ -431,7 +436,10 @@ Game.Carrot.prototype = {
     },
 
     updatePosition:function() {
-        this.position_x += 0.1;
+// SIZE_FACTOR
+//        this.position_x += 0.1;
+//        this.position_y += 0.2;
+        this.position_x += 0.4;
         this.position_y += 0.2;
 
         this.x = this.base_x + Math.cos(this.position_x) * 2;
@@ -496,7 +504,9 @@ Game.Door.prototype.constructor = Game.Door;
 
 Game.Player = function(x, y) {
 
-    Game.MovingObject.call(this, x, y, 7, 12);
+// SIZE_FACTOR
+//    Game.MovingObject.call(this, x, y, 7, 12);
+    Game.MovingObject.call(this, x, y, 28, 48);
     Game.Animator.call(this, Game.Player.prototype.frame_sets["idle-left"], 10);
 
     this.jumping = true;
@@ -519,22 +529,32 @@ Game.Player.prototype = {
 
     jump: function() {
 // TODO: keep hardcoded 10?
-        if (!this.jumping && (this.velocity_y < 10)) {
+// SIZE_FACTOR
+//        if (!this.jumping && (this.velocity_y < 10)) {
+        if (!this.jumping && (this.velocity_y < 20)) {
             this.jumping = true;
 // TODO: "-=" or just "-"?
 // TODO: should adapt, and fix tunneling issue...
-            this.velocity_y -= 13;
+// SIZE_FACTOR
+//            this.velocity_y -= 13;
+            this.velocity_y -= 26;
         }
     },
 
     moveLeft: function() {
-    	this.direction_x = -1;
-        this.velocity_x -= 0.55;
+// SIZE_FACTOR
+//    	this.direction_x = -1;
+//        this.velocity_x -= 0.55;
+    	this.direction_x = -4;
+        this.velocity_x -= 2.2;
     },
 
     moveRight: function() {
-    	this.direction_x = 1;
-        this.velocity_x += 0.55;
+// SIZE_FACTOR
+//    	this.direction_x = 1;
+//        this.velocity_x += 0.55;
+    	this.direction_x = 4;
+        this.velocity_x += 2.2;
     },
 
     updateAnimation: function() {
@@ -604,6 +624,8 @@ Game.TileSet = function(columns, tile_size) {
 
 // TODO: change this and get it from data files
 // TODO: remove carrots, grass, etc from here!
+// SIZE_FACTOR
+/*
     this.frames = [new frame(115,  96, 13, 16, 0, -2), // idle-left
                              new frame( 50,  96, 13, 16, 0, -2), // jump-left
                              new frame(102,  96, 13, 16, 0, -2), new frame(89, 96, 13, 16, 0, -2), new frame(76, 96, 13, 16, 0, -2), new frame(63, 96, 13, 16, 0, -2), // walk-left
@@ -612,6 +634,16 @@ Game.TileSet = function(columns, tile_size) {
                              new frame( 13, 112, 13, 16, 0, -2), new frame(26, 112, 13, 16, 0, -2), new frame(39, 112, 13, 16, 0, -2), new frame(52, 112, 13, 16, 0, -2), // walk-right
                              new frame( 81, 112, 14, 16), new frame(96, 112, 16, 16), // carrot
                              new frame(112, 115, 16,  4), new frame(112, 124, 16, 4), new frame(112, 119, 16, 4) // grass
+                             ];
+*/
+    this.frames = [new frame(460,  384, 52, 64, 0, -8), // idle-left
+                             new frame( 200,  384, 52, 64, 0, -8), // jump-left
+                             new frame(408,  384, 52, 64, 0, -8), new frame(356, 384, 52, 64, 0, -8), new frame(304, 384, 52, 64, 0, -8), new frame(252, 384, 52, 64, 0, -8), // walk-left
+                             new frame(  0, 448, 52, 64, 0, -8), // idle-right
+                             new frame( 260, 448, 52, 64, 0, -8), // jump-right
+                             new frame( 52, 448, 52, 64, 0, -8), new frame(104, 448, 52, 64, 0, -8), new frame(156, 448, 52, 64, 0, -8), new frame(208, 448, 52, 64, 0, -8), // walk-right
+                             new frame( 324, 448, 56, 64), new frame(384, 448, 64, 64), // chilli
+                             new frame(448, 460, 64,  16), new frame(448, 496, 64, 16), new frame(448, 476, 64, 16) // grass
                              ];
 
 };
@@ -637,10 +669,14 @@ Game.World = function() {
     this.columns = 12;
     this.rows = 9;
 
-    this.tile_set = new Game.TileSet(8, 16);
+// SIZE_FACTOR
+//    this.tile_set = new Game.TileSet(8, 16);
+    this.tile_set = new Game.TileSet(8, 64);
 
 // TODO: handle other objects ... (create from map data - other layers)
-    this.player = new Game.Player(32, 76);
+// SIZE_FACTOR
+//    this.player = new Game.Player(32, 76);
+    this.player = new Game.Player(128, 304);
 
     this.zone_id   = "00";
 
@@ -701,20 +737,28 @@ Game.World.prototype = {
         this.grass = new Array();
 
 // TODO: MAKE GENERIC!
+if (typeof zone.carrots !== 'undefined') {
         for (let index = zone.carrots.length - 1; index > -1; -- index) {
             let carrot = zone.carrots[index];
-            this.carrots[index] = new Game.Carrot(carrot[0] * this.tile_set.tile_size + 5, carrot[1] * this.tile_set.tile_size - 2);
+// SIZE_FACTOR
+//            this.carrots[index] = new Game.Carrot(carrot[0] * this.tile_set.tile_size + 5, carrot[1] * this.tile_set.tile_size - 2);
+            this.carrots[index] = new Game.Carrot(carrot[0] * this.tile_set.tile_size + 20, carrot[1] * this.tile_set.tile_size - 8);
         }
+}
 
         for (let index = zone.doors.length - 1; index > -1; --index) {
             let door = zone.doors[index];
             this.doors[index] = new Game.Door(door);
         }
 
+if (typeof zone.grass !== 'undefined') {
         for (let index = zone.grass.length - 1; index > -1; -- index) {
             let grass = zone.grass[index];
-            this.grass[index] = new Game.Grass(grass[0] * this.tile_set.tile_size, grass[1] * this.tile_set.tile_size + 12);
+// SIZE_FACTOR
+//            this.grass[index] = new Game.Grass(grass[0] * this.tile_set.tile_size, grass[1] * this.tile_set.tile_size + 12);
+            this.grass[index] = new Game.Grass(grass[0] * this.tile_set.tile_size, grass[1] * this.tile_set.tile_size + 48);
         }
+}
 
         if (this.door) {
             if (this.door.destination_x != -1) {

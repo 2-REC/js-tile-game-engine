@@ -2,11 +2,11 @@
 
   "doors" : [
 
-    { "x":32, "y":-16, "width":80, "height":16,
-      "destination_zone":"02", "destination_x":-1, "destination_y":143 },
+    { "x":128, "y":-64, "width":320, "height":64,
+      "destination_zone":"02", "destination_x":-1, "destination_y":540 },
 
-    { "x":192, "y":80, "width":16, "height":64,
-      "destination_zone":"04", "destination_x":0, "destination_y":-1 }
+    { "x":768, "y":320, "width":64, "height":256,
+      "destination_zone":"04", "destination_x":32, "destination_y":-1 }
 
   ],
 

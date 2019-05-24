@@ -1,5 +1,10 @@
 # TODO
 
+- GAME
+  - [ ] Fix size problem: when changing size of tiles, the whole game breaks.
+    => Due to hardcoded value, not depending on the tiles size (look for "SIZE-FACTOR" comments in code), and for "doors" in level files (JSON).
+    (! - for doors, the x & y destination positions need to change depending on the tile size as well, but not proportionnally? (with size 64, adding(when at left of screen)/subtracting(when at right of screen) 32 seems ok)
+
 - LEVELS
   => Do as in Replica:
   - [ ] Handle several visual layers (with z-index, speeds, etc.: background(s), foreground(s), overlay?)

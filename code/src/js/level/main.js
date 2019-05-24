@@ -107,7 +107,7 @@ window.addEventListener("load", function(event) {
         }
 
 // TODO: CHANGE!
-        p.innerHTML = "Carrots: " + game.world.carrot_count;
+        p.innerHTML = "Chillis: " + game.world.carrot_count;
 
         display.render();
     };
