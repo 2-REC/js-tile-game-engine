@@ -1,12 +1,36 @@
 # TODO
 
-- [ ] Remove carrots stuff, and adapt levels/zones ...
-- [ ] Change objects handling
-    => As in Replica (object layer with IDs)
-- [ ] Handle several visual layers for levels (as in Replica, with z-index)
-    => And change grass to "graphical objects"
-?- [ ] Make separate files for objects? (clasify?)
+- LEVELS
+  => Do as in Replica:
+  - [ ] Handle several visual layers (with z-index, speeds, etc.: background(s), foreground(s), overlay?)
+  - [ ] Use binary files for layers
+  - [ ] ! - But use JSON instead of XML
+  - [ ] Handle more than 1 tileset
+    => Different ones for each level, each object, etc.
+  - [ ] Add fixed "objects" to level (similar to grass, but static, and as tiles)
 
+- OBJECTS
+  - [ ] Change objects handling
+    => As in Replica (object layer with IDs)
+  - [ ] Remove carrots stuff, and adapt levels/zones ...
+  - [ ] Change grass to "graphical objects"
+  - [ ] Doors
+    - [ ] Use an "ID" for doors (determined by "HOTSPOT_DOOR + ID"), as well as a "destination ID" (-1 for default?)
+      => When loading new zone/level, position player at door with "desitnation ID" (-1 for the "main" door)
+      - [ ] Make sure to avoid "cycles" problems when positioning player in front of a door
+        => Use a small offset.
+    - [ ] Handle different types of doors:
+      - [ ] Inter-level: loads a level
+        => Door object (from Objects & Hotspots layers - as in Replica)
+      - [ ] Intra-level: loads a zone (in same level)
+        => 2 types:
+          - [ ] "Normal" - as in Replica: Door object (from Objects & Hotspots layers)
+          - [ ] "Passage" - as currently in engine: Zone (delimited by collision rectangle) (typically adjacent to an edge of the level)
+            => Keep player's position when entering, and position player at same X or Y depending on the zone's position (side edge => keep Y, and use X of door ; top/bottom edge => keep X, and use Y of door)
+  - [ ] ? - Make separate source files for objects? (classify?)
+  - [ ] Add more object types ...
+
+- ENGINE
 - [ ] Fix tunnelling problem the right way (IT IS A COLLISION PROBLEM)
     => PROBLEM ALSO OCCURS AFTER "FIX", WHEN JUMPING FROM RIGHT TO LEFT THROUGH A "U" SHAPED TILE!
 - [ ] Handle separate sheets for sprites and map (1 per object)
