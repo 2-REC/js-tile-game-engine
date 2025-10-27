@@ -1,10 +1,10 @@
 # js-tile-game-engine
 
+![screenshot](docs/screenshot.png "Demo")
+
 ## Description
 
 Tile-based game engine written in JavaScript.
-
-![screenshot]("docs/screenshot.png" "Demo")
 
 The project serves as a JavaScript learning exercise as well as understanding and experimenting game development aspects (essentially about 2D platformers).
 
