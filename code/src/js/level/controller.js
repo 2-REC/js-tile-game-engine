@@ -1,60 +1,45 @@
-/**
- * CONTROLLER CLASS
- */
+/* controller.js */
 
-// TODO: separate key up/down?
+// TODO: separate key up/down
 
-const Controller = function() {
+class ButtonInput {
+    active = false;
+    down = false;
 
-    //// BEGIN
-    this.left  = new Controller.ButtonInput();
-    this.right = new Controller.ButtonInput();
-    this.up    = new Controller.ButtonInput();
-    //// END
-
-
-    this.keyDownUp = function(type, key_code) {
-        //// BEGIN
-        var down = (type == "keydown") ? true : false;
-        switch (key_code) {
-            case 37:
-                this.left.getInput(down);
-                break;
-            case 38:
-                this.up.getInput(down);
-                break;
-            case 39:
-                this.right.getInput(down);
-                break;
-        }
-        //// END
-    };
-
-};
-
-// TODO: necessary?
-Controller.prototype.constructor = Controller;
-
-
-/**
- * CONTROLLER.BUTTONINPUT CLASS
- */
-
- // TODO: rewrite?
-Controller.ButtonInput = function() {
-    this.active = false;
-    this.down = false;
-};
-
-Controller.ButtonInput.prototype = {
-
-    constructor : Controller.ButtonInput,
-
-    getInput : function(down) {
+    update(down) {
         if (this.down != down) {
             this.active = down;
         }
         this.down = down;
     }
 
-};
+}
+
+
+export class Controller {
+
+    left = new ButtonInput();
+    right = new ButtonInput();
+    up = new ButtonInput();
+
+    /*
+    constructor(){
+    }
+    */
+
+    keyDownUp(type, key_code) {
+        const down = (type === "keydown") ? true : false;
+        switch (key_code) {
+            case 37:
+                this.left.update(down);
+                break;
+            case 38:
+                this.up.update(down);
+                break;
+            case 39:
+                this.right.update(down);
+                break;
+        }
+    }
+
+}
