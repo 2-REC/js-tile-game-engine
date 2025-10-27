@@ -1,181 +1,172 @@
-/**
- * MAIN - GAME STARTING POINT
- */
+/* main.js */
 
-window.addEventListener("load", function(event) {
+// TODO: use URL
+import { AssetManager } from "./assetmanager.js";
+import { Game } from "./game.js";
+import { Display } from "./display.js";
+import { Controller } from "./controller.js";
+import { Engine } from "./engine.js";
 
-    "use strict";
 
 // TODO: get from somewhere...
-    const ZONE_PREFIX = "../../res/json/levels/zone";
-    const ZONE_SUFFIX = ".json";
+// TODO: replace by regex
+const ZONE_PREFIX = "../../res/json/levels/zone";
+const ZONE_SUFFIX = ".json";
 
 
-    /*
-     * CLASSES
-     */
+class Main {
+    #asset_manager;
+    #game;
+    #display;
+    #controller;
+    #engine;
+// TODO: horrible!
+    #p;
 
-    /**
-     * ASSETSMANAGER CLASS
-     */
-    const AssetsManager = function() {
-        this.tile_set_image = undefined;
-    };
+    constructor() {
+        this.#asset_manager = new AssetManager();
+    }
 
-    AssetsManager.prototype = {
+// TODO: pass zone_id here...?
+    loadLevel() {
+        this.#game = new Game();
+        this.#display = new Display(document, document.querySelector("canvas"));
+        this.#controller = new Controller();
+        // TODO: set time step as configurable param?
+        this.#engine = new Engine(1000/30, this);
 
-        constructor: Game.AssetsManager,
+        // TODO: CHANGE!
+//        const p = document.createElement("p");
+        this.#p = document.createElement("p");
+        this.#p.setAttribute("style", "color:#000000; font-size:2.0em; margin:0; position:fixed;");
+        this.#p.innerHTML = "Carrots: 0";
+        document.body.appendChild(this.#p);
 
-        requestJSON: function(url, callback) {
-            let request = new XMLHttpRequest();
-            request.addEventListener("load", function(event) {
-                callback(JSON.parse(this.responseText));
-            }, { once:true });
+// TODO: move to Display class init function... + set buffer as private!
+        this.#display.buffer.canvas.height = this.#game.world.height;
+        this.#display.buffer.canvas.width = this.#game.world.width;
+        this.#display.buffer.imageSmoothingEnabled = false;
 
-            request.open("GET", url);
-            request.send();
-        },
+        this.#asset_manager.requestJSON(ZONE_PREFIX + this.#game.world.zone_id + ZONE_SUFFIX, (zone) => {
+            this.#game.world.setup(zone);
+        // TODO: get filename from level config & path from game config?
+        const image_path = "../../res/images/levels/tilesheet.png";
+            this.#asset_manager.requestImage(image_path, (image) => {
+                this.#asset_manager.tile_set_image = image;
+                this.resize();
+                this.#engine.start();
+            });
+        });
 
-        requestImage: function(url, callback) {
-            let image = new Image();
-            image.addEventListener("load", function(event) {
-                callback(image);
-            }, { once:true });
-            image.src = url;
+    }
+
+    resize(event) {
+        this.#display.resize(document.documentElement.clientWidth - 32,
+                document.documentElement.clientHeight - 32,
+                this.#game.world.height / this.#game.world.width);
+        this.#display.render();
+
+        // TODO: CHANGE! => use sprites!
+        const rectangle = this.#display.context.canvas.getBoundingClientRect();
+        this.#p.style.left = rectangle.left + "px";
+        this.#p.style.top  = rectangle.top + "px";
+        this.#p.style.fontSize = ((this.#game.world.tile_set.tile_size * rectangle.height / 2.0) / this.#game.world.height) + "px";
+
+    }
+
+// TODO: split key up/down + do as in other engine
+    keyDownUp(event) {
+        this.#controller.keyDownUp(event.type, event.keyCode);
+    }
+
+    
+    update() {
+        if (this.#controller.left.active) {
+            this.#game.world.player.moveLeft();
+        }
+        if (this.#controller.right.active) {
+            this.#game.world.player.moveRight();
+        }
+        if (this.#controller.up.active) {
+            this.#game.world.player.jump();
+            this.#controller.up.active = false;
         }
 
-    };
+        this.#game.update();
 
+        if (this.#game.world.door) {
+// TODO: stop? could pause instead? (stop when other level)
+            this.#engine.stop();
+            this.#asset_manager.requestJSON(ZONE_PREFIX + this.#game.world.door.destination_zone + ZONE_SUFFIX, (zone) => {
+                this.#game.world.setup(zone);
+                this.#engine.start();
+            });
+            return;
+        }
 
-    /*
-     * FUNCTIONS
-     */
+    }
 
-    var keyDownUp = function(event) {
-        controller.keyDownUp(event.type, event.keyCode);
-    };
+// TODO: move to world? or display?
+    render() {
+        let frame = undefined;
 
-    var resize = function(event) {
-        display.resize(document.documentElement.clientWidth - 32,
-                document.documentElement.clientHeight - 32,
-                game.world.height / game.world.width);
-        display.render();
+        this.#display.drawMap(this.#asset_manager.tile_set_image,
+                this.#game.world.tile_set.columns, this.#game.world.graphical_map,
+                this.#game.world.columns, this.#game.world.tile_set.tile_size);
 
-// TODO: CHANGE!
-        var rectangle = display.context.canvas.getBoundingClientRect();
-        p.style.left = rectangle.left + "px";
-        p.style.top  = rectangle.top + "px";
-        p.style.fontSize = ((game.world.tile_set.tile_size * rectangle.height) / game.world.height) + "px";
+        // TODO: CHANGE (MAKE GENERIC!)
+        for (let index = this.#game.world.carrots.length - 1; index > -1; -- index) {
+            let carrot = this.#game.world.carrots[index];
+            frame = this.#game.world.tile_set.frames[carrot.animator.frame_value];
 
-    };
-
-    var render = function() {
-
-        var frame = undefined;
-
-        display.drawMap(assets_manager.tile_set_image,
-                game.world.tile_set.columns, game.world.graphical_map,
-                game.world.columns, game.world.tile_set.tile_size);
-
-// TODO: CHANGE (MAKE GENERIC!)
-        for (let index = game.world.carrots.length - 1; index > -1; -- index) {
-            let carrot = game.world.carrots[index];
-            frame = game.world.tile_set.frames[carrot.frame_value];
-
-            display.drawObject(assets_manager.tile_set_image,
+            this.#display.drawObject(this.#asset_manager.tile_set_image,
                     frame.x, frame.y,
                     carrot.x + Math.floor(carrot.width * 0.5 - frame.width * 0.5) + frame.offset_x,
                     carrot.y + frame.offset_y, frame.width, frame.height);
         }
 
-        frame = game.world.tile_set.frames[game.world.player.frame_value];
+        frame = this.#game.world.tile_set.frames[this.#game.world.player.animator.frame_value];
 
-        display.drawObject(assets_manager.tile_set_image,
+        this.#display.drawObject(this.#asset_manager.tile_set_image,
                 frame.x, frame.y,
-                game.world.player.x + Math.floor(game.world.player.width * 0.5 - frame.width * 0.5) + frame.offset_x,
-                game.world.player.y + frame.offset_y,
+                this.#game.world.player.x + Math.floor(this.#game.world.player.width * 0.5 - frame.width * 0.5) + frame.offset_x,
+                this.#game.world.player.y + frame.offset_y,
                 frame.width, frame.height);
 
-        for (let index = game.world.grass.length - 1; index > -1; -- index) {
-            let grass = game.world.grass[index];
-            frame = game.world.tile_set.frames[grass.frame_value];
+        for (let index = this.#game.world.grass.length - 1; index > -1; -- index) {
+            let grass = this.#game.world.grass[index];
+            frame = this.#game.world.tile_set.frames[grass.animator.frame_value];
 
-            display.drawObject(assets_manager.tile_set_image,
+            this.#display.drawObject(this.#asset_manager.tile_set_image,
                     frame.x, frame.y,
                     grass.x + frame.offset_x,
                     grass.y + frame.offset_y, frame.width, frame.height);
         }
 
-// TODO: CHANGE!
-        p.innerHTML = "Chillis: " + game.world.carrot_count;
+    // TODO: CHANGE!
+        this.#p.innerHTML = "Chillis: " + this.#game.world.carrot_count;
 
-        display.render();
-    };
-
-    var update = function() {
-        if (controller.left.active) {
-            game.world.player.moveLeft();
-        }
-        if (controller.right.active) {
-            game.world.player.moveRight();
-        }
-        if (controller.up.active) {
-            game.world.player.jump();
-            controller.up.active = false;
-        }
-
-        game.update();
-
-        if (game.world.door) {
-            engine.stop();
-            assets_manager.requestJSON(ZONE_PREFIX + game.world.door.destination_zone + ZONE_SUFFIX, (zone) => {
-                game.world.setup(zone);
-                engine.start();
-          });
-          return;
-        }
-
-    };
+        this.#display.render();
+    }
 
 
-    /*
-     * INITIALISATIONS
-     */
 
-    var assets_manager = new AssetsManager();
-    var game = new Game();
-    var display = new Display(document.querySelector("canvas"));
-    var controller = new Controller();
-// TODO: set time step as configurable param?
-    var engine = new Engine(1000/30, render, update);
-
-// TODO: CHANGE!
-    var p = document.createElement("p");
-    p.setAttribute("style", "color:#c07000; font-size:2.0em; position:fixed;");
-    p.innerHTML = "Carrots: 0";
-    document.body.appendChild(p);
-
-// TODO: move to Display class init function...
-    display.buffer.canvas.height = game.world.height;
-    display.buffer.canvas.width = game.world.width;
-    display.buffer.imageSmoothingEnabled = false;
+}
 
 
-    assets_manager.requestJSON(ZONE_PREFIX + game.world.zone_id + ZONE_SUFFIX, (zone) => {
-        game.world.setup(zone);
-// TODO: get filename from level config & path from game config?
-var image_path = "../../res/images/levels/tilesheet.png";
-        assets_manager.requestImage(image_path, (image) => {
-            assets_manager.tile_set_image = image;
-            resize();
-            engine.start();
-        });
-    });
+
+window.addEventListener("load", function(event) {
+
+    const main = new Main();
+
+    // TODO: throttle event
+    window.addEventListener("resize", (event) => { main.resize(event) });
+
+    // TODO: separate key up/down
+    window.addEventListener("keydown", (event) => { main.keyDownUp(event) });
+    window.addEventListener("keyup", (event) => { main.keyDownUp(event) });
 
 
-    window.addEventListener("resize", resize);
-// TODO: separate key up/down?
-    window.addEventListener("keydown", keyDownUp);
-    window.addEventListener("keyup", keyDownUp);
+    main.loadLevel();
 
 });
