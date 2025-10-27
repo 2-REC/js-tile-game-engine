@@ -22,3 +22,8 @@
 ## Usage
 
 To test the example game, simply load the ```index.html``` file in the browser
+
+
+## Demo
+
+The game can be played [here](https://2-rec.github.io/js-tile-game-engine/).
