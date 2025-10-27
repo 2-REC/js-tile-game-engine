@@ -2,21 +2,30 @@
 
 ## Description
 
-(Etremely) Basic tile-based game engine written in JavaScript.
+Tile-based game engine written in JavaScript.
 
-![screenshot](screenshot.png "Demo")
+![screenshot]("docs/screenshot.png" "Demo")
+
+The project serves as a JavaScript learning exercise as well as understanding and experimenting game development aspects (essentially about 2D platformers).
+
 
 ## Features
 
-* Keyboard controls
-    * Left/right: move
-    * Up: jump
+The project is still in a very basic state, only implementing a minimum set of features:
+
+* Game loop
 * Items
     * Animated
     * Pickable
     * Counter
-* Levels
-    * Multiple rooms (1 per screen)
+* Keyboard controls
+    * Left/right: move
+    * Up: jump
+* Level (only 1 for now)
+    * Multiple rooms (1 per screen) (no scrolling)
+    * Loaded from description (JSON format)
+
+A long list of other features is required, some of them specified in the [TODO](TODO.md) document.
 
 
 ## Usage
