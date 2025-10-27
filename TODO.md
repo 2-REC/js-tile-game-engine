@@ -2,25 +2,25 @@
 
 ## GENERAL
 
-  - [ ] Add link to playable demo in README (host demo on git pages?).
+- [x] Add link to playable demo in README (host demo on git pages).
 
 
 ## GAME
 
-  - [ ] Fix size problem: when changing size of tiles, the whole game breaks.
+- [ ] Fix size problem: when changing size of tiles, the whole game breaks.
     => Due to hardcoded value, not depending on the tiles size (look for "SIZE-FACTOR" comments in code), and for "doors" in level files (JSON).
     (! - for doors, the x & y destination positions need to change depending on the tile size as well, but not proportionnally? (with size 64, adding(when at left of screen)/subtracting(when at right of screen) 32 seems ok)
 
 
 ## LEVELS
 
-  => Do as in Replica:
-  - [ ] Handle several visual layers (with z-index, speeds, etc.: background(s), foreground(s), overlay?)
-  - [ ] Use binary files for layers
-  - [ ] ! - But use JSON instead of XML
-  - [ ] Handle more than 1 tileset
-    => Different ones for each level, each object, etc.
-  - [ ] Add fixed "objects" to level (similar to grass, but static, and as tiles)
+=> Do as in Replica:
+- [ ] Handle several visual layers (with z-index, speeds, etc.: background(s), foreground(s), overlay?)
+- [ ] Use binary files for layers
+- [ ] ! - But use JSON instead of XML
+- [ ] Handle more than 1 tileset
+	=> Different ones for each level, each object, etc.
+- [ ] Add fixed "objects" to level (similar to grass, but static, and as tiles)
 
 
 ## OBJECTS
