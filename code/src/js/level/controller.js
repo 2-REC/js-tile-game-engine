@@ -3,12 +3,10 @@
 // TODO: separate key up/down
 
 class ButtonInput {
-
     active = false;
     down = false;
 
-    // TODO: rename method
-    getInput(down) {
+    update(down) {
         if (this.down != down) {
             this.active = down;
         }
@@ -33,13 +31,13 @@ export class Controller {
         const down = (type === "keydown") ? true : false;
         switch (key_code) {
             case 37:
-                this.left.getInput(down);
+                this.left.update(down);
                 break;
             case 38:
-                this.up.getInput(down);
+                this.up.update(down);
                 break;
             case 39:
-                this.right.getInput(down);
+                this.right.update(down);
                 break;
         }
     }

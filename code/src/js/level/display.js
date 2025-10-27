@@ -1,15 +1,14 @@
 /* display.js */
 
 export class Display {
-
     buffer;
     context;
+
 
 // TODO: change double buffering stuff...
     constructor(document, canvas) {
         this.buffer  = document.createElement("canvas").getContext("2d");
         this.context = canvas.getContext("2d");
-
     }
 
     drawMap(tilesheet, tilesheet_nb_columns, map, map_nb_columns, tile_size) {
@@ -29,7 +28,7 @@ export class Display {
                 destination_x, destination_y, tile_size, tile_size
             );
         }
-    };
+    }
 
     drawObject(sprite_sheet, source_x, source_y, destination_x, destination_y, width, height) {
         this.buffer.drawImage(
@@ -37,7 +36,7 @@ export class Display {
             source_x, source_y, width, height,
             Math.round(destination_x), Math.round(destination_y), width, height
         );
-    };
+    }
 
     resize(width, height, height_width_ratio) {
         if ((height / width) > height_width_ratio) {
@@ -50,7 +49,7 @@ export class Display {
         }
 
         this.context.imageSmoothingEnabled = false;
-    };
+    }
 
     render() {
         this.context.drawImage(

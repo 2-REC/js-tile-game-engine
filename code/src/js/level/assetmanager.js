@@ -2,6 +2,8 @@
 
 export class AssetManager {
 
+    // TODO: should be stored in 'main' instead?
+    tile_set_image_path;
     tile_set_image;
 
     //constructor?

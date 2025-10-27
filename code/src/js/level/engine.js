@@ -34,6 +34,7 @@ export class Engine {
         window.cancelAnimationFrame(this.#animation_frame_request);
     }
 
+    // TODO: FIX FPS!
     loop(time) {
 
         this.#animation_frame_request = window.requestAnimationFrame((time) => { this.loop(time); });
